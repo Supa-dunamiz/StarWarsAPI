@@ -18,7 +18,7 @@ namespace StarWarsAPI.Controllers
         }
 
         [Authorize]
-        [HttpGet("GetAllShips")]
+        [HttpGet("Ships")]
         public async Task<IActionResult> GetAll()
         {
             var ships = await _repo.GetAllAsync();
@@ -26,7 +26,7 @@ namespace StarWarsAPI.Controllers
         }
 
         [Authorize]
-        [HttpGet("GetShipById/{id}")]
+        [HttpGet("Ships/{id}")]
         public async Task<IActionResult> Get(int id)
         {
             var result = await _repo.GetByIdAsync(id);
