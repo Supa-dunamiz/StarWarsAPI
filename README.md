@@ -42,12 +42,16 @@ ________________________________________
 🔐 Authentication
 ----------------------------------------
 To access the endpoints, you must be authenticated.
-Admin User
+Admin User:
+
 •	Username: admin
 •	Password: 123456
-Regular User
+
+Regular User:
+
 •	Username: User
 •	Password: password
+
 ℹ️ Regular users can create and read starships, but cannot update or delete records.
 ________________________________________
 🧪 Unit Testing
