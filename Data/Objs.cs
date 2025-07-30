@@ -97,5 +97,11 @@
         public string Username { get; set; }
         public string Password { get; set; }
     }
+    public class AppUser
+    {
+        public string Username { get; set; }
+        public string PasswordHash { get; set; } // Use hashed passwords
+    }
+
 
 }

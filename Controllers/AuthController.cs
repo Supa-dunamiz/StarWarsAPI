@@ -31,31 +31,10 @@ namespace StarWarsAPI.Controllers
             if (user == null)
                 return Unauthorized("Invalid credentials");
 
-            var token = GenerateJwtToken(dto.Username);
+            var token = _userService.GenerateJwtToken(dto.Username, _jwtSettings);
             return Ok(new { token });
         }
 
-        private string GenerateJwtToken(string username)
-        {
-            var claims = new[]
-            {
-                new Claim(ClaimTypes.Name, username),
-                new Claim(ClaimTypes.Role, "Admin")
-            };
-
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Key));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-            var token = new JwtSecurityToken(
-                issuer: _jwtSettings.Issuer,
-                audience: _jwtSettings.Audience,
-                claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(_jwtSettings.ExpireMinutes),
-                signingCredentials: creds
-            );
-
-            return new JwtSecurityTokenHandler().WriteToken(token);
-        }
     }
 
 }

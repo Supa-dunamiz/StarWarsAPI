@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using StarWarsAPI.Helpers;
 using StarWarsAPI.Models;
 using StarWarsAPI.Repositories;
 
@@ -49,24 +50,24 @@ namespace StarWarsAPI.Controllers
             return Ok(done);
         }
 
-        [Authorize]
         [HttpPost("AddFilm")]
+        [Authorize(Roles = UserRoles.Admin)]
         public async Task<IActionResult> AddFilm([FromBody] AddFilmToStarshipDto dto)
         {
             var success = await _repo.AddFilmToStarshipAsync(dto.StarshipId, dto.FilmId);
             return Ok(success);
         }
 
-        [Authorize]
         [HttpPost("AddPilot")]
+        [Authorize(Roles = UserRoles.Admin)]
         public async Task<IActionResult> AddPilot([FromBody] AddPilotToStarshipDto dto)
         {
             var success = await _repo.AddPilotToStarshipAsync(dto.StarshipId, dto.PilotId);
             return Ok(success);
         }
 
-        [Authorize]
         [HttpPut("UpdateShip/{id}")]
+        [Authorize(Roles = UserRoles.Admin)]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateStarshipDto dto)
         {
             if (dto == null)
@@ -79,8 +80,8 @@ namespace StarWarsAPI.Controllers
             return Ok(true);
         }
 
-        [Authorize]
         [HttpDelete("DeleteShip/{id}")]
+        [Authorize(Roles = UserRoles.Admin)]
         public async Task<IActionResult> Delete(int id)
         {
             bool done = await _repo.DeleteAsync(id);
