@@ -9,7 +9,6 @@ namespace StarWarsAPI.Repositories
 {
     public class UserService : IUserService
     {
-        private string Roles;
         private readonly List<AppUser> _users = new()
         {
             new AppUser { Username = "admin", PasswordHash = BCrypt.Net.BCrypt.HashPassword("123456") },

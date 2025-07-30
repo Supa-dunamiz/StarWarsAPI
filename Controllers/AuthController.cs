@@ -24,7 +24,7 @@ namespace StarWarsAPI.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost("GetToken")]
+        [HttpPost]
         public IActionResult Login([FromBody] LoginDto dto)
         {
             var user = _userService.Authenticate(dto.Username, dto.Password);
