@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using StarWarsAPI.Data;
+using StarWarsAPI.Helpers;
 using StarWarsAPI.Models;
 using System.Globalization;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
@@ -9,10 +10,12 @@ namespace StarWarsAPI.Repositories
     public class StarshipRepository : IStarshipRepository
     {
         private readonly AppDbContext _context;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public StarshipRepository(AppDbContext context)
+        public StarshipRepository(AppDbContext context, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
+            _httpContextAccessor = httpContextAccessor;
         }
         public async Task<IEnumerable<StarshipDto>> GetAllAsync()
         {
@@ -36,7 +39,7 @@ namespace StarWarsAPI.Repositories
                     Starship_class = s.StarshipClass,
                     Created = s.Created,
                     Edited = s.Edited,
-                    Url = s.Url,
+                    Url = UrlBuilder.BuildStarshipUrl(_httpContextAccessor.HttpContext, s.Id),
                     Films = s.Films.Select(f => f.Url).ToList(),
                     Pilots = s.Pilots.Select(p => p.Url).ToList()
                 })
@@ -70,7 +73,7 @@ namespace StarWarsAPI.Repositories
                 Starship_class = s.StarshipClass,
                 Created = s.Created,
                 Edited = s.Edited,
-                Url = s.Url,
+                Url = UrlBuilder.BuildStarshipUrl(_httpContextAccessor.HttpContext, s.Id),
                 Films = s.Films.Select(f => f.Url).ToList(),
                 Pilots = s.Pilots.Select(p => p.Url).ToList()
             };
@@ -97,7 +100,7 @@ namespace StarWarsAPI.Repositories
             var pagedItems = sortedData
                 .Skip((query.PageNumber - 1) * query.PageSize)
                 .Take(query.PageSize)
-                .Select(s => StarshipHelper.ToDto(s))
+                .Select(s => CreateDto(s))
                 .ToList();
 
             return new PagedResult<StarshipReadDTO>
@@ -196,10 +199,40 @@ namespace StarWarsAPI.Repositories
         {
             return await _context.SaveChangesAsync() > 0;
         }
+        private StarshipReadDTO CreateDto(Starship s)
+        {
+            return new StarshipReadDTO
+            {
+                Id = s.Id,
+                Name = s.Name,
+                Model = s.Model,
+                Manufacturer = s.Manufacturer,
+                Cost_in_credits = s.CostInCredits,
+                Length = s.Length,
+                Max_atmosphering_speed = s.MaxAtmospheringSpeed,
+                Crew = s.Crew,
+                Passengers = s.Passengers,
+                Cargo_capacity = s.CargoCapacity,
+                Consumables = s.Consumables,
+                Hyperdrive_rating = s.HyperdriveRating,
+                MGLT = s.MGLT,
+                Starship_class = s.StarshipClass,
+                Url = UrlBuilder.BuildStarshipUrl(_httpContextAccessor.HttpContext, s.Id),
+                Created = s.Created,
+                Edited = s.Edited,
+                Films = s.Films?.Select(f => f.Url).ToList() ?? new(),
+                Pilots = s.Pilots?.Select(p => p.Url).ToList() ?? new()
+            };
+        }
+
         private static class StarshipHelper
         {
             public static void UpdateStarshipFromDto(Starship existing, UpdateStarshipDto dto)
             {
+                if(existing == null ||  dto == null) return;
+
+                existing.Edited = DateTime.UtcNow;
+
                 if (!string.IsNullOrWhiteSpace(dto.Name))
                     existing.Name = dto.Name;
 
@@ -238,9 +271,6 @@ namespace StarWarsAPI.Repositories
 
                 if (!string.IsNullOrWhiteSpace(dto.Starship_class))
                     existing.StarshipClass = dto.Starship_class;
-
-                if (!string.IsNullOrWhiteSpace(dto.Url))
-                    existing.Url = dto.Url;
             }
             public static Starship MapToStarship(CreateStarshipDto dto)
             {
@@ -303,31 +333,6 @@ namespace StarWarsAPI.Repositories
             {
                 if (string.IsNullOrWhiteSpace(value) || value.Trim().ToLower() == "unknown") return 0;
                 return int.TryParse(value.Replace(",", ""), out var result) ? result : 0;
-            }
-            public static StarshipReadDTO ToDto(Starship s)
-            {
-                return new StarshipReadDTO
-                {
-                    Id = s.Id,
-                    Name = s.Name,
-                    Model = s.Model,
-                    Manufacturer = s.Manufacturer,
-                    Cost_in_credits = s.CostInCredits,
-                    Length = s.Length,
-                    Max_atmosphering_speed = s.MaxAtmospheringSpeed,
-                    Crew = s.Crew,
-                    Passengers = s.Passengers,
-                    Cargo_capacity = s.CargoCapacity,
-                    Consumables = s.Consumables,
-                    Hyperdrive_rating = s.HyperdriveRating,
-                    MGLT = s.MGLT,
-                    Starship_class = s.StarshipClass,
-                    Url = s.Url,
-                    Created = s.Created,
-                    Edited = s.Edited,
-                    Films = s.Films?.Select(f => f.Url).ToList() ?? new(),
-                    Pilots = s.Pilots?.Select(p => p.Url).ToList() ?? new()
-                };
             }
         }
     }

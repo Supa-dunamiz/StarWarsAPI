@@ -54,9 +54,21 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+var useDocker = builder.Configuration.GetValue<bool>("UseDocker");
+
 builder.Services.AddDbContext<AppDbContext>(options =>
-        options.UseSqlite("Data Source=/data/starships.db"));
-//options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"))); //Use this if you want to run locally without docker
+{
+    if (useDocker)
+    {
+        options.UseSqlite(builder.Configuration.GetConnectionString("DockerConnection"));
+    }
+    else
+    {
+        options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
+    }
+});
+
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<Seed>();
 builder.Services.AddScoped<IStarshipRepository, StarshipRepository>();
