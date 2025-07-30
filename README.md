@@ -42,6 +42,7 @@ ________________________________________
 🔐 Authentication
 ----------------------------------------
 To access the endpoints, you must be authenticated.
+
 Admin User:
 
 •	Username: admin
