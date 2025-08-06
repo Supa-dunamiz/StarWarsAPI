@@ -103,5 +103,14 @@
         public string PasswordHash { get; set; } // Use hashed passwords
     }
 
-
+    public class UpdateFilmDTO
+    {
+        public int StarshipId { get; set; }
+        public int FilmId { get; set; }
+    }    
+    public class UpdatePilotDTO
+    {
+        public int StarshipId { get; set; }
+        public int PilotId { get; set; }
+    }
 }

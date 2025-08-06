@@ -1,24 +1,21 @@
-﻿# Stage 1: Build the app
+﻿# Stage 1: Build
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-WORKDIR /src
+WORKDIR /app
 
-# Copy sln and project files
-COPY StarWarsAPI.sln .
-COPY StarWarsAPI/StarWarsAPI.csproj StarWarsAPI/
+# Copy only StarWarsAPI.csproj and restore
+COPY StarWarsAPI.csproj ./
+RUN dotnet restore StarWarsAPI.csproj
 
-# Restore only what’s necessary
-RUN dotnet restore
-
-# Copy everything else
+# Copy the rest of the source
 COPY . .
 
-# Build and publish only the API project
-WORKDIR /src/StarWarsAPI
-RUN dotnet publish -c Release -o /app/publish
+# Publish only the API project
+RUN dotnet publish StarWarsAPI.csproj -c Release -o /out
 
-# Stage 2: Serve the app
+# Stage 2: Runtime
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
-COPY --from=build /app/publish .
+COPY --from=build /out .
+
 EXPOSE 8080
 ENTRYPOINT ["dotnet", "StarWarsAPI.dll"]

@@ -44,6 +44,7 @@ namespace StarWarsAPI.Repositories
                     Pilots = s.Pilots.Select(p => p.Url).ToList()
                 })
                 .ToListAsync();
+            
         }
         public async Task<StarshipDto?> GetByIdAsync(int id)
         {
@@ -223,6 +224,45 @@ namespace StarWarsAPI.Repositories
                 Films = s.Films?.Select(f => f.Url).ToList() ?? new(),
                 Pilots = s.Pilots?.Select(p => p.Url).ToList() ?? new()
             };
+        }
+
+        public async Task<bool> RemovePilotFromStarshipAsync(int starshipId, int pilotId)
+        {
+            if (starshipId <= 0 || pilotId <= 0) return false;
+
+            var starship = await _context.Starships.Include(s => s.Pilots).Where(p => p.Id == starshipId).FirstOrDefaultAsync();
+            if(starship == null) return false;
+
+            var pilot = await _context.Pilots.FindAsync(pilotId);
+            if(pilot == null) return false;
+
+            if (!starship.Pilots.Contains(pilot))
+            {
+                return false;
+            }
+            starship.Pilots.Remove(pilot);
+            
+            return await SaveAsync();
+
+        }
+
+        public async Task<bool> RemoveFilmFromStarshipAsync(int starshipId, int filmId)
+        {
+            if (starshipId <= 0 || filmId <= 0) return false;
+
+            var starship = await _context.Starships.Include(s => s.Films).Where(p => p.Id == starshipId).FirstOrDefaultAsync();
+            if (starship == null) return false;
+
+            var film = await _context.Films.FindAsync(filmId);
+            if (film == null) return false;
+
+            if (!starship.Films.Contains(film))
+            {
+                return false;
+            }
+            starship.Films.Remove(film);
+
+            return await SaveAsync();
         }
 
         private static class StarshipHelper

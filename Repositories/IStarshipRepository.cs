@@ -6,6 +6,8 @@ namespace StarWarsAPI.Repositories
     {
         Task<bool> AddFilmToStarshipAsync(int starshipId, int filmId);
         Task<bool> AddPilotToStarshipAsync(int starshipId, int pilotId);
+        Task<bool> RemovePilotFromStarshipAsync(int starshipId, int pilotId);
+        Task<bool> RemoveFilmFromStarshipAsync(int starshipId, int filmId);
         Task<bool> CreateAsync(CreateStarshipDto dto);
         Task<bool> DeleteAsync(int id);
         Task<IEnumerable<StarshipDto>> GetAllAsync();

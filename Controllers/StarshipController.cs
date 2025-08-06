@@ -18,15 +18,13 @@ namespace StarWarsAPI.Controllers
             _repo = repo;
         }
 
-        [Authorize]
-        [HttpGet()]
-        public async Task<IActionResult> GetStarShips()
-        {
-            var ships = await _repo.GetAllAsync();
-            return Ok(ships);
-        }
+        //[HttpGet()]
+        //public async Task<IActionResult> GetStarShips()
+        //{
+        //    var ships = await _repo.GetAllAsync();
+        //    return Ok(ships);
+        //}
 
-        [Authorize]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetStarShipById(int id)
         {
@@ -34,15 +32,14 @@ namespace StarWarsAPI.Controllers
             return result == null ? NotFound() : Ok(result);
         }
 
-        [Authorize]
-        [HttpGet("paged")]
+        [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> GetStarShipsPaged([FromQuery] StarshipQueryParameters query)
         {
             var result = await _repo.GetPagedAsync(query);
             return Ok(result);
         }
 
-        [Authorize]
         [HttpPost]
         public async Task<IActionResult> CreateStarShip([FromBody] CreateStarshipDto starship)
         {
@@ -50,21 +47,37 @@ namespace StarWarsAPI.Controllers
             return Ok(done);
         }
 
-        [HttpPost("{starshipId}/films/{filmId}")]
-        [Authorize(Roles = UserRoles.Admin)]
-        public async Task<IActionResult> AddFilm(int starshipId, int filmId)
+        [HttpPost("AddFilmToStarship")]
+        [Authorize(Roles = UserRoles.Admin)]  
+        public async Task<IActionResult> AddFilm([FromBody] UpdateFilmDTO dto)
         {
-            var success = await _repo.AddFilmToStarshipAsync(starshipId, filmId);
+            var success = await _repo.AddFilmToStarshipAsync(dto.StarshipId, dto.FilmId);
             return Ok(success);
         }
 
-        [HttpPost("{starshipId}/pilots/{pilotId}")]
+        [HttpPost("AddPilotToStarship")]
         [Authorize(Roles = UserRoles.Admin)]
-        public async Task<IActionResult> AddPilot(int starshipId, int pilotId)
+        public async Task<IActionResult> AddPilot([FromBody] UpdatePilotDTO dto)
         {
-            var success = await _repo.AddPilotToStarshipAsync(starshipId, pilotId);
+            var success = await _repo.AddPilotToStarshipAsync(dto.StarshipId, dto.PilotId);
             return Ok(success);
         }
+
+        [HttpPut("RemovePilotFromStarship")]
+        [Authorize(Roles = UserRoles.Admin)]
+        public async Task<IActionResult> RemovePilot([FromBody] UpdatePilotDTO dto)
+        {
+            var success = await _repo.RemovePilotFromStarshipAsync(dto.StarshipId, dto.PilotId);
+            return Ok(success);
+        }
+        [HttpPut("RemoveFilmFromStarship")]
+        [Authorize(Roles = UserRoles.Admin)]
+        public async Task<IActionResult> RemoveFilm([FromBody] UpdateFilmDTO dto)
+        {
+            var success = await _repo.RemoveFilmFromStarshipAsync(dto.StarshipId, dto.FilmId);
+            return Ok(success);
+        }
+
 
         [HttpPut("{id}")]
         [Authorize(Roles = UserRoles.Admin)]

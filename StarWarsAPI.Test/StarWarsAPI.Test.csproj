@@ -21,7 +21,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\StarWarsAPI\StarWarsAPI.csproj" />
+	  <ProjectReference Include="..\StarWarsAPI.csproj" />
 	</ItemGroup>
 
   <ItemGroup>
